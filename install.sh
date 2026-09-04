@@ -19,6 +19,10 @@ readonly BIN_DIR="${DOTFILES_BIN:-${HOME}/.local/bin}"
 readonly ASSET='dotfiles-darwin-arm64'
 readonly API='https://api.github.com'
 
+# Temporary download directory; a global so the EXIT trap can still see it
+# after main() returns.
+workdir=''
+
 #######################################
 # Call the GitHub API with the token.
 # Globals:
@@ -63,6 +67,7 @@ for asset in json.load(sys.stdin)["assets"]:
 #   BIN_DIR
 #   DOTFILES_TAG
 #   DOTFILES_TOKEN
+#   workdir
 # Arguments:
 #   None
 # Outputs:
@@ -74,7 +79,6 @@ main() {
   local binary_id
   local checksum_id
   local tag
-  local workdir
 
   if [[ -z "${DOTFILES_TOKEN:-}" ]]; then
     printf 'DOTFILES_TOKEN is not set.\n' >&2
